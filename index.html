@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e1c32">
+  <meta name="description" content="Soukromá evidence pracovní doby a lékařských služeb. Funguje na GitHub Pages.">
+  <title>Hodiny — Evidence pracovní doby</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" type="module" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#zapis" aria-label="Hodiny – domovská stránka">
+        <span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="11" stroke="currentColor" stroke-width="2.5"/><path d="M16 9v8l6 3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></span>
+        <span><strong>HODINY</strong><small>WORKTIME TRACKER</small></span>
+      </a>
+      <div class="nav-category">PRACOVNÍ PROSTOR</div>
+      <nav class="navigation" aria-label="Hlavní navigace">
+        <a class="nav-link active" href="#zapis" data-tab="zapis"><span class="nav-icon">✎</span> Nový zápis</a>
+        <a class="nav-link" href="#databaze" data-tab="databaze"><span class="nav-icon">▤</span> Databáze <span class="nav-count" id="nav-count">0</span></a>
+        <a class="nav-link" href="#prehled" data-tab="prehled"><span class="nav-icon">▥</span> Přehled hodin</a>
+        <a class="nav-link" href="#zaloha" data-tab="zaloha"><span class="nav-icon">⇅</span> Záloha a import</a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="privacy-box"><span class="privacy-icon">◈</span><div><strong>Soukromá evidence</strong><p>Údaje se ukládají pouze v tomto prohlížeči, nikoliv na GitHub.</p></div></div>
+      <div class="sidebar-foot">HODINY · v1.0</div>
+    </aside>
+    <div class="main-wrap">
+      <header class="topbar">
+        <button id="mobile-menu" class="menu-toggle" type="button" aria-label="Otevřít nabídku">☰</button>
+        <span class="breadcrumb">Pracovní prostor <span>/</span> <strong id="breadcrumb-label">Nový zápis</strong></span>
+        <span class="topbar-right"><span class="live-dot"></span> Lokální databáze</span>
+      </header>
+      <main class="main-content">
+        <section class="page active" id="page-zapis">
+          <div class="page-title-row">
+            <div><div class="eyebrow">DENNÍ EVIDENCE</div><h1>Nový zápis</h1><p class="lead">Příchod, odchod a lékařské služby na jednom místě.</p></div>
+            <div class="today-chip" id="today-chip"></div>
+          </div>
+          <div class="mini-stats" id="mini-stats">
+            <div class="mini-stat"><span>Dnes</span><strong id="stat-today">0:00</strong><small>celkem hodin</small></div>
+            <div class="mini-stat"><span>Tento týden</span><strong id="stat-week">0:00</strong><small>celkem hodin</small></div>
+            <div class="mini-stat"><span>Tento měsíc</span><strong id="stat-month">0:00</strong><small>celkem hodin</small></div>
+          </div>
+          <form class="editor-grid" id="entry-form" novalidate>
+            <div class="card editor-card">
+              <div class="card-heading"><div><div class="card-kicker">01 / ZÁKLADNÍ ÚDAJE</div><h2>Datum a pracovní doba</h2></div><span class="card-symbol">◷</span></div>
+              <div class="form-field"><label for="entry-date">Datum záznamu</label><div class="date-row"><input id="entry-date" name="date" type="date" required><button type="button" class="small-btn" id="set-today">Dnes</button></div></div>
+              <div class="field-grid">
+                <div class="form-field"><label for="arrival">Příchod</label><input type="time" id="arrival" name="arrival" step="60"></div>
+                <div class="form-field"><label for="departure">Odchod</label><input type="time" id="departure" name="departure" step="60"></div>
+              </div>
+              <div class="section-divider"></div>
+              <div class="inline-summary"><span>Odpracováno – běžná doba</span><strong id="regular-preview">0:00 h</strong></div>
+            </div>
+            <div class="card editor-card service-card">
+              <div class="card-heading"><div><div class="card-kicker teal">02 / LÉKAŘSKÁ SLUŽBA</div><h2>Dienst</h2></div><span class="card-symbol service-symbol">✳</span></div>
+              <div class="field-grid duty-fields">
+                <div class="form-field"><label for="duty-start">Dienst Come</label><input type="time" id="duty-start" name="dutyStart" step="60"></div>
+                <div class="form-field"><label for="duty-end">Dienst GO</label><input type="time" id="duty-end" name="dutyEnd" step="60"></div>
+              </div>
+              <label class="toggle-line"><input id="duty-next" name="dutyNextDay" type="checkbox"><span class="switch" aria-hidden="true"></span><span><strong>Odchod následující den</strong><small>Např. 14. 5. 07:30 → 15. 5. 08:30 = 25 h</small></span></label>
+              <div class="section-divider"></div>
+              <div class="inline-summary"><span>Délka služby</span><strong id="duty-preview">0:00 h</strong></div>
+            </div>
+            <div class="card details-card">
+              <div class="card-heading compact"><div><div class="card-kicker">03 / DOPLŇUJÍCÍ ÚDAJE</div><h2>Poznámka a započtený čas</h2></div></div>
+              <div class="details-fields"><div class="form-field"><label for="entry-type">Typ dne</label><select id="entry-type"><option value="">Běžný den</option><option value="Urlaub">Dovolená / Urlaub</option><option value="Krank">Nemoc / Krank</option><option value="Feiertag">Svátek / Feiertag</option><option value="Jiné">Jiné</option></select></div><div class="form-field"><label for="credited">Započtené hodiny (H:MM)</label><input type="text" inputmode="numeric" id="credited" placeholder="0:00" autocomplete="off"><small class="field-hint">Např. 5:30 při dovolené nebo nemoci.</small></div><div class="form-field note-field"><label for="entry-note">Poznámka</label><input id="entry-note" type="text" maxlength="500" placeholder="Volitelné…"></div></div>
+            </div>
+            <div class="card result-card"><div class="result-top"><div class="card-kicker">VÝSLEDEK DNE</div><span class="result-mark">=</span></div><div class="result-number"><span id="result-total">0:00</span><span class="result-unit">hod.</span></div><div class="result-breakdown"><span>Běžná doba <b id="sum-regular">0:00</b></span><span>Služba <b id="sum-duty">0:00</b></span><span>Započteno <b id="sum-credit">0:00</b></span></div><p class="overlap-warning" id="overlap-warning" hidden>Pracovní doba a služba se překrývají. Překryv se v celkovém výsledku počítá jen jednou.</p><p class="overnight-info" id="overnight-info" hidden>Služba pokračuje do následujícího kalendářního dne.</p><button class="primary-btn" id="save-btn" type="submit">Uložit záznam <span aria-hidden="true">↗</span></button><button class="text-btn" id="reset-form" type="button">Vymazat formulář</button><p id="form-message" class="form-message" role="status" aria-live="polite"></p></div>
+          </form>
+          <div class="foot-note">Hodiny přes půlnoc se přiřazují k datu začátku služby. Po uložení je můžeš upravit v databázi.</div>
+        </section>
+        <section class="page" id="page-databaze">
+          <div class="page-title-row"><div><div class="eyebrow">HISTORIE ZÁZNAMŮ</div><h1>Databáze</h1><p class="lead">Všechny uložené dny, pracovní hodiny a služby.</p></div><button id="db-new" class="primary-btn action-btn" type="button">+ Nový zápis</button></div>
+          <div class="card data-card"><div class="table-toolbar"><label class="search-box"><span>⌕</span><input id="db-search" type="search" placeholder="Hledat datum nebo poznámku" aria-label="Hledat v databázi"></label><div class="toolbar-side"><select id="db-month" aria-label="Filtrovat měsíc"><option value="">Všechny měsíce</option></select><select id="db-type" aria-label="Filtrovat typ záznamu"><option value="">Všechny záznamy</option><option value="duty">Jen služby</option><option value="credit">Započtené hodiny</option></select></div></div><div class="table-scroll"><table class="records-table"><thead><tr><th>DATUM</th><th>PŘÍCHOD</th><th>ODCHOD</th><th>DIENST COME</th><th>DIENST GO</th><th>BĚŽNÁ</th><th>SLUŽBA</th><th>CELKEM</th><th></th></tr></thead><tbody id="records-body"></tbody></table></div><div class="table-footer"><span id="db-info">0 záznamů</span><strong id="db-total"></strong></div><div class="empty-table" id="db-empty" hidden>Žádné záznamy neodpovídají filtru.</div></div>
+        </section>
+        <section class="page" id="page-prehled">
+          <div class="page-title-row"><div><div class="eyebrow">ANALÝZA DOCHÁZKY</div><h1>Přehled hodin</h1><p class="lead">Denní, týdenní i měsíční statistiky včetně služeb.</p></div><select id="year-select" class="year-select" aria-label="Rok statistiky"></select></div>
+          <div class="summary-grid"><div class="card big-stat"><span>Celkový čas v roce</span><strong id="year-total">0:00</strong><small>Běžná doba + služby + započtené hodiny</small></div><div class="card big-stat"><span>Pracovní doba</span><strong id="year-regular">0:00</strong><small>Podle časů příchodu a odchodu</small></div><div class="card big-stat"><span>Služby</span><strong id="year-duty">0:00</strong><small><span id="year-dutycount">0</span> služeb</small></div><div class="card big-stat"><span>Započtené hodiny</span><strong id="year-credit">0:00</strong><small>Např. dovolená a nemoc</small></div></div>
+          <div class="card chart-card"><div class="chart-header"><div class="card-kicker">PŘEHLED PO MĚSÍCÍCH</div><div class="chart-legend"><span class="legend-reg"></span> Běžná doba <span class="legend-duty"></span> Služby <span class="legend-credit"></span> Započteno</div></div><div id="month-chart" class="month-chart"></div></div>
+          <div class="split-lists"><div class="card summary-list-card"><h2>Měsíční souhrn</h2><div class="table-scroll"><table class="summary-table"><thead><tr><th>MĚSÍC</th><th>BĚŽNÁ</th><th>SLUŽBA</th><th>CELKEM</th></tr></thead><tbody id="month-body"></tbody></table></div></div><div class="card summary-list-card"><h2>Týdenní souhrn</h2><div class="table-scroll week-scroll"><table class="summary-table"><thead><tr><th>TÝDEN (ISO)</th><th>SLUŽBY</th><th>CELKEM</th></tr></thead><tbody id="week-body"></tbody></table></div></div></div>
+        </section>
+        <section class="page" id="page-zaloha"><div class="page-title-row"><div><div class="eyebrow">VAŠE DATA</div><h1>Záloha a import</h1><p class="lead">Databázi lze importovat z připraveného JSON nebo exportovat pro vlastní zálohu.</p></div></div>
+          <div class="settings-grid"><div class="card settings-card"><span class="settings-icon">⇩</span><h2>Import původní databáze</h2><p>Vyber soubor <code>hodiny_private_import.json</code> připravený z tvého Excelu. Import proběhne pouze ve tvém zařízení a nepřepíše automaticky jiné dny bez potvrzení.</p><div class="import-year-row"><label for="import-year">Rok původního Excelu</label><input type="number" id="import-year" min="2000" max="2100" step="1" value="2026"><small>Zdrojový Excel obsahuje měsíce a dny, nikoliv rok; předvyplněn je rok 2026. Při importu běžné zálohy se rok nemění.</small></div><label for="import-file" class="file-picker">Vybrat JSON soubor</label><input id="import-file" type="file" accept=".json,application/json" hidden><p id="import-result" class="subtle" role="status"></p></div><div class="card settings-card"><span class="settings-icon">⇧</span><h2>Export / záloha</h2><p>Exportuj všechny záznamy, abys je mohl později obnovit nebo otevřít v Excelu. Doporučujeme zálohovat pravidelně.</p><div class="backup-actions"><button id="export-json" type="button" class="secondary-btn">Stáhnout JSON</button><button id="export-csv" type="button" class="secondary-btn">Stáhnout CSV</button></div><p class="subtle">JSON = plná obnova; CSV = pro Excel.</p></div></div>
+          <div class="card privacy-detail"><h2>Jak funguje ukládání?</h2><p>GitHub Pages hostuje pouze soubory aplikace. Všechny zápisy se ukládají lokálně do úložiště tohoto prohlížeče (<code>localStorage</code>). To znamená, že aplikace funguje i bez přihlášení, ale zápisy se <strong>nesynchronizují mezi telefonem a počítačem</strong>. Při vymazání dat prohlížeče se mohou ztratit – proto slouží export JSON. Původní data nikdy nepřidávej do veřejného GitHub repozitáře.</p></div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div class="mobile-overlay" id="mobile-overlay"></div>
+</body>
+</html>
